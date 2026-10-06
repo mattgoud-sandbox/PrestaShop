@@ -12,6 +12,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use PrestaShop\PrestaShop\Core\CommandBus\Attributes\AsCommandHandler;
 use PrestaShop\PrestaShop\Core\Domain\Employee\Command\SetEmployeeTwoFactorSecretCommand;
 use PrestaShop\PrestaShop\Core\Domain\Employee\CommandHandler\SetEmployeeTwoFactorSecretHandlerInterface;
+use PrestaShop\PrestaShop\Core\Domain\Employee\Exception\EmployeeNotFoundException;
 use PrestaShopBundle\Entity\Employee\Employee as EntityEmployee;
 use PrestaShopBundle\Entity\Repository\EmployeeRepository;
 
@@ -34,10 +35,16 @@ final class SetEmployeeTwoFactorSecretHandler implements SetEmployeeTwoFactorSec
      */
     public function handle(SetEmployeeTwoFactorSecretCommand $command)
     {
-        /** @var EntityEmployee $employee */
+        /** @var EntityEmployee|null $employee */
         $employee = $this->employeeRepository->findOneBy([
             'id' => $command->getEmployeeId()->getValue(),
         ]);
+        if ($employee === null) {
+            throw new EmployeeNotFoundException(
+                $command->getEmployeeId(),
+                sprintf('Employee with id "%s" cannot be found.', $command->getEmployeeId()->getValue())
+            );
+        }
 
         $employee
             ->setTwoFactorSecret($command->getSecret())
