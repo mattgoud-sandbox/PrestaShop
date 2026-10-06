@@ -719,6 +719,17 @@ class Employee implements UserInterface, PasswordAuthenticatedUserInterface, Equ
         $this->defaultLanguage->setLocale($data['defaultLocale'] ?? 'en');
     }
 
+    public function resetTwoFactorAuthentication(): void
+    {
+        $this->twoFactorEnabled = false;
+        $this->twoFactorTotEnabled = false;
+        $this->twoFactorEmailEnabled = false;
+        $this->twoFactorTotpSecretEncrypted = null;
+        $this->twoFactorTotpSecretPlain = null;
+        $this->twoFactorEmailAuthCode = null;
+        $this->twoFactorBackupCodes = null;
+    }
+
     public function getTwoFactorSecret(): ?string
     {
         return $this->twoFactorTotpSecretEncrypted;
