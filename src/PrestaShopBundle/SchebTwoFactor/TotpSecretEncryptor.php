@@ -4,30 +4,25 @@
  * docs/licenses/LICENSE.txt file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace PrestaShopBundle\SchebTwoFactor;
 
-use PhpEncryption;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use PrestaShop\PrestaShop\Core\Crypto\SecretCipherInterface;
 
 final class TotpSecretEncryptor
 {
-    public function __construct(
-        #[Autowire('%new_cookie_key%')]
-        private ?string $newCookieKey = null
-    ) {
+    public function __construct(private readonly SecretCipherInterface $cipher)
+    {
     }
 
     public function encrypt(string $plain): string
     {
-        $cipherTool = new PhpEncryption($this->newCookieKey);
-
-        return $cipherTool->encrypt($plain);
+        return $this->cipher->encrypt($plain);
     }
 
     public function decrypt(string $encoded): string
     {
-        $cipherTool = new PhpEncryption($this->newCookieKey);
-
-        return $cipherTool->decrypt($encoded);
+        return $this->cipher->decrypt($encoded);
     }
 }

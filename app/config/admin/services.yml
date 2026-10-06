@@ -132,6 +132,13 @@ services:
     autoconfigure: true
     tags: [ 'doctrine.event_subscriber' ]
 
+  PrestaShop\PrestaShop\Adapter\Crypto\PhpEncryptionCipher:
+    arguments:
+      $key: '%new_cookie_key%'
+
+  PrestaShop\PrestaShop\Core\Crypto\SecretCipherInterface:
+    alias: PrestaShop\PrestaShop\Adapter\Crypto\PhpEncryptionCipher
+
   PrestaShopBundle\SchebTwoFactor\TotpSecretEncryptor:
     autowire: true
     autoconfigure: true
