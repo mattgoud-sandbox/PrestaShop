@@ -151,6 +151,12 @@ class EmployeeCore extends ObjectModel
     ];
 
     protected $webserviceParameters = [
+        'hidden_fields' => [
+            'two_factor_email_enabled',
+            'two_factor_enabled',
+            'two_factor_required',
+            'two_factor_totp_enabled',
+        ],
         'fields' => [
             'id_lang' => ['xlink_resource' => 'languages'],
             'last_passwd_gen' => ['setter' => false],
@@ -159,6 +165,10 @@ class EmployeeCore extends ObjectModel
             'stats_compare_from' => ['setter' => false],
             'stats_compare_to' => ['setter' => false],
             'passwd' => ['setter' => 'setWsPasswd'],
+            'two_factor_email_enabled' => ['setter' => false],
+            'two_factor_enabled' => ['setter' => false],
+            'two_factor_required' => ['setter' => false],
+            'two_factor_totp_enabled' => ['setter' => false],
         ],
     ];
 
