@@ -122,6 +122,11 @@
         <target>Welcome!</target>
         <note>File: classes/Customer.php [Line: 1297]</note>
       </trans-unit>
+      <trans-unit id="fe62898421932d0e7fc86ed02110faf0">
+        <source>Your authentication code</source>
+        <target>Your authentication code</target>
+        <note>File: src/Adapter/TotMailer/TwoFactorAuthCodePrestashopMailer.php [Line: 41]</note>
+      </trans-unit>
       <trans-unit id="32e8a8d9ed872f16d6dae0dc5fd4bb71">
         <source>Your guest account has been transformed into a customer account</source>
         <target>Your guest account has been transformed into a customer account</target>

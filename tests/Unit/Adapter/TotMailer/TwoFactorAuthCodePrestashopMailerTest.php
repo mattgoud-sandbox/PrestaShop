@@ -69,8 +69,9 @@ final class TwoFactorAuthCodePrestashopMailerTest extends TestCase
         $shopContext = $this->createMock(ShopContext::class);
         $shopContext->method('getId')->willReturn(3);
         $translator = $this->createMock(TranslatorInterface::class);
+        $translator->method('getLocale')->willReturn('en-US');
         $translator->expects(self::once())->method('trans')
-            ->with('Your authentication code', [], 'Admin.Advparameters.Feature')
+            ->with('Your authentication code', [], 'Emails.Subject', 'fr-FR')
             ->willReturn('Authentication code subject');
 
         return new TwoFactorAuthCodePrestashopMailer($shopContext, $translator);

@@ -38,7 +38,7 @@ final class TwoFactorAuthCodePrestashopMailer implements AuthCodeMailerInterface
         $sent = Mail::Send(
             $user->getDefaultLanguage()->getId(),
             'two_factor_auth_code',
-            $this->translator->trans('Your authentication code', [], 'Admin.Advparameters.Feature'),
+            $this->translator->trans('Your authentication code', [], 'Emails.Subject', $user->getDefaultLanguage()->getLocale()),
             $templateVars,
             $user->getEmailAuthRecipient(),
             null,

@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Tests\Unit\PrestaShopBundle\Translation;
 
 use PHPUnit\Framework\TestCase;
+use PrestaShop\TranslationToolsBundle\Translation\Extractor\PhpExtractor;
 use PrestaShop\TranslationToolsBundle\Translation\Extractor\TwigExtractor;
 use PrestaShop\TranslationToolsBundle\Twig\Extension\TranslationExtension;
 use Symfony\Component\Translation\Loader\XliffFileLoader;
@@ -18,6 +19,23 @@ use Twig\Loader\ArrayLoader;
 
 final class TwoFactorMailCatalogueTest extends TestCase
 {
+    public function testTwoFactorMailSubjectIsInTheDefaultCatalogue(): void
+    {
+        $extracted = new MessageCatalogue('en');
+        (new PhpExtractor())->extract(
+            _PS_ROOT_DIR_ . '/src/Adapter/TotMailer/TwoFactorAuthCodePrestashopMailer.php',
+            $extracted
+        );
+        self::assertArrayHasKey('Your authentication code', $extracted->all('Emails.Subject'));
+
+        $catalogue = (new XliffFileLoader())->load(
+            _PS_ROOT_DIR_ . '/translations/default/EmailsSubject.xlf',
+            'en',
+            'Emails.Subject'
+        );
+        self::assertTrue($catalogue->defines('Your authentication code', 'Emails.Subject'));
+    }
+
     public function testAllTwoFactorMailMessagesAreInTheDefaultCatalogue(): void
     {
         $twig = new Environment(new ArrayLoader());
