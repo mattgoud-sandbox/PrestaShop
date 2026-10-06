@@ -4,6 +4,8 @@
  * docs/licenses/LICENSE.txt file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace PrestaShop\PrestaShop\Core\Domain\Employee\Command;
 
 use PrestaShop\PrestaShop\Core\Domain\Employee\ValueObject\EmployeeId;
@@ -326,12 +328,12 @@ class EditEmployeeCommand
     /**
      * @return bool|null
      */
-    public function getTwoFactorEnabled()
+    public function getTwoFactorEnabled(): ?bool
     {
         return $this->twoFactorEnabled;
     }
 
-    public function setTwoFactorEnabled($twoFactorEnabled): self
+    public function setTwoFactorEnabled(bool $twoFactorEnabled): self
     {
         $this->twoFactorEnabled = $twoFactorEnabled;
 
@@ -353,12 +355,12 @@ class EditEmployeeCommand
     /**
      * @return bool|null
      */
-    public function getTwoFactorTotEnabled()
+    public function getTwoFactorTotEnabled(): ?bool
     {
         return $this->twoFactorTotEnabled;
     }
 
-    public function setTwoFactorTotEnabled($twoFactorTotEnabled): self
+    public function setTwoFactorTotEnabled(bool $twoFactorTotEnabled): self
     {
         $this->twoFactorTotEnabled = $twoFactorTotEnabled;
 
@@ -368,12 +370,12 @@ class EditEmployeeCommand
     /**
      * @return bool|null
      */
-    public function getTwoFactorEmailEnabled()
+    public function getTwoFactorEmailEnabled(): ?bool
     {
         return $this->twoFactorEmailEnabled;
     }
 
-    public function setTwoFactorEmailEnabled($twoFactorEmailEnabled): self
+    public function setTwoFactorEmailEnabled(bool $twoFactorEmailEnabled): self
     {
         $this->twoFactorEmailEnabled = $twoFactorEmailEnabled;
 
