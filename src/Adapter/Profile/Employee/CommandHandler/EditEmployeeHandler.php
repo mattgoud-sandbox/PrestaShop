@@ -13,6 +13,7 @@ use PrestaShop\PrestaShop\Core\Crypto\Hashing;
 use PrestaShop\PrestaShop\Core\Domain\Employee\Command\EditEmployeeCommand;
 use PrestaShop\PrestaShop\Core\Domain\Employee\CommandHandler\EditEmployeeHandlerInterface;
 use PrestaShop\PrestaShop\Core\Domain\Employee\Exception\EmailAlreadyUsedException;
+use PrestaShop\PrestaShop\Core\Domain\Employee\Exception\EmployeeConstraintException;
 use PrestaShop\PrestaShop\Core\Domain\Employee\Exception\EmployeeException;
 use PrestaShop\PrestaShop\Core\Domain\Employee\Exception\InvalidProfileException;
 use PrestaShop\PrestaShop\Core\Domain\Employee\Exception\MissingShopAssociationException;
@@ -117,6 +118,13 @@ final class EditEmployeeHandler extends AbstractEmployeeHandler implements EditE
 
         if (null !== $command->getTwoFactorRequired()) {
             $employee->two_factor_required = $command->getTwoFactorRequired();
+        }
+
+        if ($employee->two_factor_enabled && !$employee->two_factor_totp_enabled && !$employee->two_factor_email_enabled) {
+            throw new EmployeeConstraintException(
+                'Enabled two-factor authentication requires email or TOTP authentication.',
+                EmployeeConstraintException::INVALID_TWO_FACTOR_CONFIGURATION
+            );
         }
 
         if (!$command->getTwoFactorTotEnabled()) {

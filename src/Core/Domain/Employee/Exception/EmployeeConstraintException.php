@@ -40,4 +40,9 @@ class EmployeeConstraintException extends EmployeeException
      * Code used when the default page is not accessible for the employee's profile.
      */
     public const INVALID_HOMEPAGE = 6;
+
+    /**
+     * Code used when enabled two-factor authentication has no email or TOTP provider.
+     */
+    public const INVALID_TWO_FACTOR_CONFIGURATION = 7;
 }
