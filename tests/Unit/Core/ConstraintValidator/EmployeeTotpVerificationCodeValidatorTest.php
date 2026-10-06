@@ -12,7 +12,8 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PrestaShop\PrestaShop\Core\ConstraintValidator\Constraints\EmployeeTotpVerificationCode;
 use PrestaShop\PrestaShop\Core\ConstraintValidator\EmployeeTotpVerificationCodeValidator;
-use PrestaShop\PrestaShop\Core\Employee\ContextEmployeeProviderInterface;
+use PrestaShop\PrestaShop\Core\Context\Employee as ContextEmployee;
+use PrestaShop\PrestaShop\Core\Context\EmployeeContext;
 use PrestaShopBundle\Entity\Employee\Employee;
 use PrestaShopBundle\Entity\Repository\EmployeeRepository;
 use Scheb\TwoFactorBundle\Security\TwoFactor\Provider\Totp\TotpAuthenticatorInterface;
@@ -26,19 +27,21 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
  */
 final class EmployeeTotpVerificationCodeValidatorTest extends ConstraintValidatorTestCase
 {
-    private ContextEmployeeProviderInterface&MockObject $employeeProvider;
+    private EmployeeContext&MockObject $employeeContext;
+    private ContextEmployee&MockObject $currentEmployee;
     private EmployeeRepository&MockObject $employeeRepository;
     private TotpAuthenticatorInterface&MockObject $totpAuthenticator;
 
     protected function createValidator(): EmployeeTotpVerificationCodeValidator
     {
-        $this->employeeProvider = $this->createMock(ContextEmployeeProviderInterface::class);
+        $this->employeeContext = $this->createMock(EmployeeContext::class);
+        $this->currentEmployee = $this->createMock(ContextEmployee::class);
         $this->employeeRepository = $this->createMock(EmployeeRepository::class);
         $this->totpAuthenticator = $this->createMock(TotpAuthenticatorInterface::class);
 
         return new EmployeeTotpVerificationCodeValidator(
             $this->totpAuthenticator,
-            $this->employeeProvider,
+            $this->employeeContext,
             $this->employeeRepository
         );
     }
@@ -105,7 +108,7 @@ final class EmployeeTotpVerificationCodeValidatorTest extends ConstraintValidato
 
     public function testNonemptyCodeIsSkippedWhenAuthenticatorIsUnavailable(): void
     {
-        $this->validator = new EmployeeTotpVerificationCodeValidator(null, $this->employeeProvider, $this->employeeRepository);
+        $this->validator = new EmployeeTotpVerificationCodeValidator(null, $this->employeeContext, $this->employeeRepository);
         $this->setTotpActivationRequested(true);
         $this->expectNoCredentialLookup();
 
@@ -119,7 +122,8 @@ final class EmployeeTotpVerificationCodeValidatorTest extends ConstraintValidato
     {
         $this->setTotpActivationRequested(true);
         $employee = new Employee();
-        $this->employeeProvider->expects(self::once())->method('getId')->willReturn(21);
+        $this->employeeContext->expects(self::once())->method('getEmployee')->willReturn($this->currentEmployee);
+        $this->currentEmployee->expects(self::once())->method('getId')->willReturn(21);
         $this->employeeRepository->expects(self::once())->method('findOneBy')->with(['id' => 21])->willReturn($employee);
         $this->totpAuthenticator->expects(self::once())->method('checkCode')
             ->with(self::identicalTo($employee), '654321')->willReturn($isValid);
@@ -145,6 +149,38 @@ final class EmployeeTotpVerificationCodeValidatorTest extends ConstraintValidato
         ];
     }
 
+    public function testMissingContextEmployeeProducesAnInvalidCodeViolation(): void
+    {
+        $this->setTotpActivationRequested(true);
+        $this->employeeContext->expects(self::once())->method('getEmployee')->willReturn(null);
+        $this->currentEmployee->expects(self::never())->method('getId');
+        $this->employeeRepository->expects(self::never())->method('findOneBy');
+        $this->totpAuthenticator->expects(self::never())->method('checkCode');
+        $constraint = new EmployeeTotpVerificationCode();
+
+        $this->validator->validate('654321', $constraint);
+
+        $this->buildViolation($constraint->message)
+            ->setParameter('{{ string }}', '654321')
+            ->assertRaised();
+    }
+
+    public function testMissingPersistedEmployeeProducesAnInvalidCodeViolation(): void
+    {
+        $this->setTotpActivationRequested(true);
+        $this->employeeContext->expects(self::once())->method('getEmployee')->willReturn($this->currentEmployee);
+        $this->currentEmployee->expects(self::once())->method('getId')->willReturn(21);
+        $this->employeeRepository->expects(self::once())->method('findOneBy')->with(['id' => 21])->willReturn(null);
+        $this->totpAuthenticator->expects(self::never())->method('checkCode');
+        $constraint = new EmployeeTotpVerificationCode();
+
+        $this->validator->validate('654321', $constraint);
+
+        $this->buildViolation($constraint->message)
+            ->setParameter('{{ string }}', '654321')
+            ->assertRaised();
+    }
+
     private function setTotpActivationRequested(bool $enabled): void
     {
         $child = $this->createMock(FormInterface::class);
@@ -157,7 +193,8 @@ final class EmployeeTotpVerificationCodeValidatorTest extends ConstraintValidato
 
     private function expectNoCredentialLookup(): void
     {
-        $this->employeeProvider->expects(self::never())->method('getId');
+        $this->employeeContext->expects(self::never())->method('getEmployee');
+        $this->currentEmployee->expects(self::never())->method('getId');
         $this->employeeRepository->expects(self::never())->method('findOneBy');
         $this->totpAuthenticator->expects(self::never())->method('checkCode');
     }

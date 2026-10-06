@@ -4,10 +4,12 @@
  * docs/licenses/LICENSE.txt file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace PrestaShop\PrestaShop\Core\ConstraintValidator;
 
 use PrestaShop\PrestaShop\Core\ConstraintValidator\Constraints\EmployeeTotpVerificationCode;
-use PrestaShop\PrestaShop\Core\Employee\ContextEmployeeProviderInterface;
+use PrestaShop\PrestaShop\Core\Context\EmployeeContext;
 use PrestaShopBundle\Entity\Employee\Employee;
 use PrestaShopBundle\Entity\Repository\EmployeeRepository;
 use Scheb\TwoFactorBundle\Security\TwoFactor\Provider\Totp\TotpAuthenticatorInterface;
@@ -20,7 +22,7 @@ final class EmployeeTotpVerificationCodeValidator extends ConstraintValidator
 {
     public function __construct(
         private readonly ?TotpAuthenticatorInterface $totpAuthenticator,
-        private readonly ContextEmployeeProviderInterface $contextEmployeeProvider,
+        private readonly EmployeeContext $employeeContext,
         private readonly EmployeeRepository $employeeRepository,
     ) {
     }
@@ -47,11 +49,20 @@ final class EmployeeTotpVerificationCodeValidator extends ConstraintValidator
             return;
         }
 
-        /** @var Employee $employee */
+        $contextEmployee = $this->employeeContext->getEmployee();
+        if ($contextEmployee === null) {
+            $this->context->buildViolation($constraint->message)
+                ->setParameter('{{ string }}', $value)
+                ->addViolation();
+
+            return;
+        }
+
+        /** @var Employee|null $employee */
         $employee = $this->employeeRepository->findOneBy([
-            'id' => $this->contextEmployeeProvider->getId(),
+            'id' => $contextEmployee->getId(),
         ]);
-        $isValid = $this->totpAuthenticator->checkCode($employee, $value);
+        $isValid = $employee !== null && $this->totpAuthenticator->checkCode($employee, $value);
 
         if (!$isValid) {
             $this->context->buildViolation($constraint->message)

@@ -96,5 +96,3 @@ services:
   PrestaShop\PrestaShop\Core\ConstraintValidator\EmployeeTotpVerificationCodeValidator:
     autowire: true
     autoconfigure: true
-    arguments:
-      $contextEmployeeProvider: '@prestashop.adapter.data_provider.employee'
