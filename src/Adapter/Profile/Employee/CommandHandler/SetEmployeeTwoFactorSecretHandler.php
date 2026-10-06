@@ -33,7 +33,7 @@ final class SetEmployeeTwoFactorSecretHandler implements SetEmployeeTwoFactorSec
     /**
      * {@inheritdoc}
      */
-    public function handle(SetEmployeeTwoFactorSecretCommand $command)
+    public function handle(SetEmployeeTwoFactorSecretCommand $command): void
     {
         /** @var EntityEmployee|null $employee */
         $employee = $this->employeeRepository->findOneBy([

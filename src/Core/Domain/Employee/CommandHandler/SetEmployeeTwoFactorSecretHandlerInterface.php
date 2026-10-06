@@ -19,5 +19,5 @@ interface SetEmployeeTwoFactorSecretHandlerInterface
     /**
      * @param SetEmployeeTwoFactorSecretCommand $command
      */
-    public function handle(SetEmployeeTwoFactorSecretCommand $command);
+    public function handle(SetEmployeeTwoFactorSecretCommand $command): void;
 }

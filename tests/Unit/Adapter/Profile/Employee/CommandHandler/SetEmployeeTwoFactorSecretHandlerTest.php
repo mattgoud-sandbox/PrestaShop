@@ -12,12 +12,25 @@ use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use PrestaShop\PrestaShop\Adapter\Profile\Employee\CommandHandler\SetEmployeeTwoFactorSecretHandler;
 use PrestaShop\PrestaShop\Core\Domain\Employee\Command\SetEmployeeTwoFactorSecretCommand;
+use PrestaShop\PrestaShop\Core\Domain\Employee\CommandHandler\SetEmployeeTwoFactorSecretHandlerInterface;
 use PrestaShop\PrestaShop\Core\Domain\Employee\Exception\EmployeeNotFoundException;
 use PrestaShopBundle\Entity\Employee\Employee;
 use PrestaShopBundle\Entity\Repository\EmployeeRepository;
+use ReflectionMethod;
+use ReflectionNamedType;
 
 final class SetEmployeeTwoFactorSecretHandlerTest extends TestCase
 {
+    public function testInterfaceAndImplementationDeclareAVoidHandleContract(): void
+    {
+        foreach ([SetEmployeeTwoFactorSecretHandlerInterface::class, SetEmployeeTwoFactorSecretHandler::class] as $class) {
+            $returnType = (new ReflectionMethod($class, 'handle'))->getReturnType();
+
+            self::assertInstanceOf(ReflectionNamedType::class, $returnType);
+            self::assertSame('void', $returnType->getName());
+        }
+    }
+
     public function testBothSecretValuesReplaceThePreviousValuesBeforePersistence(): void
     {
         $employee = new Employee();
