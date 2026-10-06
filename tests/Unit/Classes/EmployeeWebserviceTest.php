@@ -30,13 +30,15 @@ final class EmployeeWebserviceTest extends TestCase
         }
     }
 
-    public function testTwoFactorSecretIsStillPersistedButHiddenAndReadOnly(): void
+    public function testTwoFactorSecretIsStillPersistedButExcludedFromTheLegacyResource(): void
     {
         $parameters = $this->generateWebserviceParameters();
 
         self::assertArrayHasKey('two_factor_totp_secret', Employee::$definition['fields']);
         self::assertContains('two_factor_totp_secret', $parameters['hidden_fields']);
-        self::assertFalse($parameters['fields']['two_factor_totp_secret']['setter']);
+        self::assertArrayNotHasKey('two_factor_totp_secret', $parameters['fields']);
+        self::assertArrayHasKey('firstname', $parameters['fields']);
+        self::assertArrayHasKey('email', $parameters['fields']);
     }
 
     private function generateWebserviceParameters(): array

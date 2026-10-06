@@ -211,6 +211,7 @@ class EmployeeCore extends ObjectModel
             'two_factor_enabled',
             'two_factor_required',
             'two_factor_totp_enabled',
+            'two_factor_totp_secret',
         ] as $field) {
             unset($parameters['fields'][$field]);
         }
