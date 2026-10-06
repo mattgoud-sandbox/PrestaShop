@@ -199,6 +199,26 @@ class EmployeeCore extends ObjectModel
     }
 
     /**
+     * @param string|null $ws_params_attribute_name
+     *
+     * @return array
+     */
+    public function getWebserviceParameters($ws_params_attribute_name = null)
+    {
+        $parameters = parent::getWebserviceParameters($ws_params_attribute_name);
+        foreach ([
+            'two_factor_email_enabled',
+            'two_factor_enabled',
+            'two_factor_required',
+            'two_factor_totp_enabled',
+        ] as $field) {
+            unset($parameters['fields'][$field]);
+        }
+
+        return $parameters;
+    }
+
+    /**
      * @see ObjectModel::getFields()
      *
      * @return array
