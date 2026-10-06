@@ -156,6 +156,7 @@ class EmployeeCore extends ObjectModel
             'two_factor_enabled',
             'two_factor_required',
             'two_factor_totp_enabled',
+            'two_factor_totp_secret',
         ],
         'fields' => [
             'id_lang' => ['xlink_resource' => 'languages'],
@@ -169,6 +170,7 @@ class EmployeeCore extends ObjectModel
             'two_factor_enabled' => ['setter' => false],
             'two_factor_required' => ['setter' => false],
             'two_factor_totp_enabled' => ['setter' => false],
+            'two_factor_totp_secret' => ['setter' => false],
         ],
     ];
 

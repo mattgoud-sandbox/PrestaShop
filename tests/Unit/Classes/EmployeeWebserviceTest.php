@@ -14,7 +14,7 @@ use ReflectionProperty;
 
 final class EmployeeWebserviceTest extends TestCase
 {
-    public function testTwoFactorFlagsAreHiddenAndCannotBeSetThroughTheWebservice(): void
+    public function testTwoFactorFieldsAreHiddenAndCannotBeSetThroughTheWebservice(): void
     {
         $employee = $this->getMockBuilder(Employee::class)
             ->disableOriginalConstructor()
@@ -33,6 +33,7 @@ final class EmployeeWebserviceTest extends TestCase
             'two_factor_enabled',
             'two_factor_required',
             'two_factor_totp_enabled',
+            'two_factor_totp_secret',
         ] as $field) {
             self::assertArrayHasKey($field, Employee::$definition['fields']);
             self::assertContains($field, $parameters['hidden_fields']);
