@@ -81,6 +81,11 @@
         <target>Attached file:</target>
         <note>File: mails/themes/modern/core/contact_form.html.twig [Line: 107]</note>
       </trans-unit>
+      <trans-unit id="abc9c64b139155cd0e6128f93088430d">
+        <source>Authentication code</source>
+        <target>Authentication code</target>
+        <note>File: mails/themes/modern/core/two_factor_auth_code.html.twig [Line: 3]</note>
+      </trans-unit>
       <trans-unit id="d698e777b19f6f487ae0490950174fde">
         <source>Awaiting check payment</source>
         <target>Awaiting check payment</target>
@@ -1150,6 +1155,11 @@
         <source>You have selected to pay by wire transfer.</source>
         <target>You have selected to pay by wire transfer.</target>
         <note>File: mails/themes/classic/core/bankwire.html.twig [Line: 50]</note>
+      </trans-unit>
+      <trans-unit id="bd270ad1ac8666cd0789a57d14eb0a91">
+        <source>Your authentication code is</source>
+        <target>Your authentication code is</target>
+        <note>File: mails/themes/modern/core/two_factor_auth_code.html.twig [Line: 88]</note>
       </trans-unit>
       <trans-unit id="9893de883531529d4a66a3851265f02e">
         <source>Your customer account creation</source>
