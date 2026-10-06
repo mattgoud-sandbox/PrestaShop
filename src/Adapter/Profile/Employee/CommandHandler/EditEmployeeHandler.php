@@ -112,9 +112,15 @@ final class EditEmployeeHandler extends AbstractEmployeeHandler implements EditE
         $employee->id_last_customer_message = $employee->getLastElementsForNotify('customer_message');
         $employee->id_last_customer = $employee->getLastElementsForNotify('customer');
         $employee->has_enabled_gravatar = $command->hasEnabledGravatar();
-        $employee->two_factor_enabled = $command->getTwoFactorEnabled();
-        $employee->two_factor_totp_enabled = $command->getTwoFactorTotEnabled();
-        $employee->two_factor_email_enabled = $command->getTwoFactorEmailEnabled();
+        if (null !== $command->getTwoFactorEnabled()) {
+            $employee->two_factor_enabled = $command->getTwoFactorEnabled();
+        }
+        if (null !== $command->getTwoFactorTotEnabled()) {
+            $employee->two_factor_totp_enabled = $command->getTwoFactorTotEnabled();
+        }
+        if (null !== $command->getTwoFactorEmailEnabled()) {
+            $employee->two_factor_email_enabled = $command->getTwoFactorEmailEnabled();
+        }
 
         if (null !== $command->getTwoFactorRequired()) {
             $employee->two_factor_required = $command->getTwoFactorRequired();
@@ -127,7 +133,7 @@ final class EditEmployeeHandler extends AbstractEmployeeHandler implements EditE
             );
         }
 
-        if (!$command->getTwoFactorTotEnabled()) {
+        if (false === $command->getTwoFactorTotEnabled()) {
             $employee->two_factor_totp_secret = null;
         }
 

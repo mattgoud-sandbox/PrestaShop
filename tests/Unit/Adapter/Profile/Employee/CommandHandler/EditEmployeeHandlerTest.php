@@ -59,6 +59,92 @@ final class EditEmployeeHandlerTest extends TestCase
         ];
     }
 
+    public function testUnrelatedEditPreservesAllTwoFactorFields(): void
+    {
+        $employee = $this->createEmployeeWithTwoFactor();
+        $employee->expects(self::once())->method('update')->willReturn(true);
+        $command = $this->createUnrelatedCommand()->setFirstName('Janet');
+
+        $this->invokeUpdate($employee, $command);
+
+        self::assertSame('Janet', $employee->firstname);
+        self::assertTrue($employee->two_factor_enabled);
+        self::assertTrue($employee->two_factor_totp_enabled);
+        self::assertTrue($employee->two_factor_email_enabled);
+        self::assertTrue($employee->two_factor_required);
+        self::assertSame('encrypted-test-secret', $employee->two_factor_totp_secret);
+    }
+
+    public function testPartialEmailTogglePreservesOtherTwoFactorFields(): void
+    {
+        $employee = $this->createEmployeeWithTwoFactor();
+        $employee->expects(self::once())->method('update')->willReturn(true);
+        $command = $this->createUnrelatedCommand()->setTwoFactorEmailEnabled(false);
+
+        $this->invokeUpdate($employee, $command);
+
+        self::assertTrue($employee->two_factor_enabled);
+        self::assertTrue($employee->two_factor_totp_enabled);
+        self::assertFalse($employee->two_factor_email_enabled);
+        self::assertTrue($employee->two_factor_required);
+        self::assertSame('encrypted-test-secret', $employee->two_factor_totp_secret);
+    }
+
+    public function testExplicitTotpDisableClearsTheSecretAndRetainsEmailAuthentication(): void
+    {
+        $employee = $this->createEmployeeWithTwoFactor();
+        $employee->expects(self::once())->method('update')->willReturn(true);
+        $command = $this->createUnrelatedCommand()->setTwoFactorTotEnabled(false);
+
+        $this->invokeUpdate($employee, $command);
+
+        self::assertTrue($employee->two_factor_enabled);
+        self::assertFalse($employee->two_factor_totp_enabled);
+        self::assertTrue($employee->two_factor_email_enabled);
+        self::assertTrue($employee->two_factor_required);
+        self::assertNull($employee->two_factor_totp_secret);
+    }
+
+    public function testExplicitGlobalDisablePreservesOmittedProvidersAndSecret(): void
+    {
+        $employee = $this->createEmployeeWithTwoFactor();
+        $employee->expects(self::once())->method('update')->willReturn(true);
+        $command = $this->createUnrelatedCommand()->setTwoFactorEnabled(false);
+
+        $this->invokeUpdate($employee, $command);
+
+        self::assertFalse($employee->two_factor_enabled);
+        self::assertTrue($employee->two_factor_totp_enabled);
+        self::assertTrue($employee->two_factor_email_enabled);
+        self::assertTrue($employee->two_factor_required);
+        self::assertSame('encrypted-test-secret', $employee->two_factor_totp_secret);
+    }
+
+    public function testPartialUpdateCannotDisableTheLastProviderWhileTwoFactorRemainsEnabled(): void
+    {
+        $employee = $this->createEmployeeWithTwoFactor();
+        $employee->two_factor_email_enabled = false;
+        $employee->expects(self::never())->method('update');
+        $command = $this->createUnrelatedCommand()->setTwoFactorTotEnabled(false);
+
+        $this->expectException(EmployeeConstraintException::class);
+        $this->expectExceptionCode(EmployeeConstraintException::INVALID_TWO_FACTOR_CONFIGURATION);
+
+        $this->invokeUpdate($employee, $command);
+    }
+
+    private function createEmployeeWithTwoFactor(): Employee&MockObject
+    {
+        $employee = $this->createEmployee();
+        $employee->two_factor_enabled = true;
+        $employee->two_factor_totp_enabled = true;
+        $employee->two_factor_email_enabled = true;
+        $employee->two_factor_required = true;
+        $employee->two_factor_totp_secret = 'encrypted-test-secret';
+
+        return $employee;
+    }
+
     private function createEmployee(): Employee&MockObject
     {
         $employee = $this->getMockBuilder(Employee::class)
@@ -74,6 +160,14 @@ final class EditEmployeeHandlerTest extends TestCase
 
     private function createCommand(bool $enabled, bool $emailEnabled, bool $totpEnabled): EditEmployeeCommand
     {
+        return $this->createUnrelatedCommand()
+            ->setTwoFactorEnabled($enabled)
+            ->setTwoFactorEmailEnabled($emailEnabled)
+            ->setTwoFactorTotEnabled($totpEnabled);
+    }
+
+    private function createUnrelatedCommand(): EditEmployeeCommand
+    {
         return (new EditEmployeeCommand(1))
             ->setFirstName('Jane')
             ->setLastName('Doe')
@@ -82,10 +176,7 @@ final class EditEmployeeHandlerTest extends TestCase
             ->setLanguageId(1)
             ->setProfileId(1)
             ->setActive(true)
-            ->setShopAssociation([1])
-            ->setTwoFactorEnabled($enabled)
-            ->setTwoFactorEmailEnabled($emailEnabled)
-            ->setTwoFactorTotEnabled($totpEnabled);
+            ->setShopAssociation([1]);
     }
 
     private function invokeUpdate(Employee $employee, EditEmployeeCommand $command): void

@@ -73,9 +73,9 @@ class EditEmployeeCommand
     private $hasEnabledGravatar = false;
 
     /**
-     * @var bool
+     * @var bool|null
      */
-    private $twoFactorEnabled = false;
+    private ?bool $twoFactorEnabled = null;
 
     /**
      * @var bool|null
@@ -83,14 +83,14 @@ class EditEmployeeCommand
     private $twoFactorRequired;
 
     /**
-     * @var bool
+     * @var bool|null
      */
-    private $twoFactorTotEnabled = false;
+    private ?bool $twoFactorTotEnabled = null;
 
     /**
-     * @var bool
+     * @var bool|null
      */
-    private $twoFactorEmailEnabled = false;
+    private ?bool $twoFactorEmailEnabled = null;
 
     /**
      * @param int $employeeId
@@ -324,7 +324,7 @@ class EditEmployeeCommand
     }
 
     /**
-     * @return bool
+     * @return bool|null
      */
     public function getTwoFactorEnabled()
     {
@@ -351,7 +351,7 @@ class EditEmployeeCommand
     }
 
     /**
-     * @return bool
+     * @return bool|null
      */
     public function getTwoFactorTotEnabled()
     {
@@ -366,7 +366,7 @@ class EditEmployeeCommand
     }
 
     /**
-     * @return bool
+     * @return bool|null
      */
     public function getTwoFactorEmailEnabled()
     {
