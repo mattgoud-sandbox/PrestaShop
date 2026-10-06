@@ -126,6 +126,7 @@ final class MailPreviewVariablesBuilder
         $templateVars['{firstname}'] = $employeeData['firstname'];
         $templateVars['{lastname}'] = $employeeData['lastname'];
         $templateVars['{email}'] = $employeeData['email'];
+        $templateVars['{auth_code}'] = '123456';
         $templateVars['{shop_name}'] = $this->context->shop->name;
         $templateVars['{shop_url}'] = $this->context->link->getPageLink('index');
         $templateVars['{my_account_url}'] = $this->context->link->getPageLink('my-account');
