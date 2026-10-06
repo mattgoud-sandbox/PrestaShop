@@ -14,6 +14,7 @@ use PrestaShopBundle\Entity\Employee\Employee;
 use PrestaShopBundle\Translation\TranslatorInterface;
 use Scheb\TwoFactorBundle\Mailer\AuthCodeMailerInterface;
 use Scheb\TwoFactorBundle\Model\Email\TwoFactorInterface;
+use Symfony\Component\Mailer\Exception\TransportException;
 
 final class TwoFactorAuthCodePrestashopMailer implements AuthCodeMailerInterface
 {
@@ -34,7 +35,7 @@ final class TwoFactorAuthCodePrestashopMailer implements AuthCodeMailerInterface
             '{lastname}' => $user->getLastName(),
         ];
 
-        Mail::Send(
+        $sent = Mail::Send(
             $user->getDefaultLanguage()->getId(),
             'two_factor_auth_code',
             $this->translator->trans('Your authentication code', [], 'Admin.Advparameters.Feature'),
@@ -51,5 +52,8 @@ final class TwoFactorAuthCodePrestashopMailer implements AuthCodeMailerInterface
             null,
             null
         );
+        if (false === $sent) {
+            throw new TransportException('Unable to send the two-factor authentication code.');
+        }
     }
 }
